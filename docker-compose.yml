@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  db:
+    container_name: db_postgres
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: bertho
+      POSTGRES_PASSWORD: idkfa123
+      POSTGRES_DB: flix
+    ports:
+      - "5555:5555"
+    networks:
+      - postgres-compose-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: equipe@puc.com.br
+      PGADMIN_DEFAULT_PASSWORD: batata123
+    ports:
+      - "16543:80"
+    depends_on:
+      - db
+    networks:
+      - postgres-compose-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_management
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    volumes:
+      # data persistence
+      - /docker_conf/rabbitmq/data/:/var/lib/rabbitmq/
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: always
+    networks:
+      - postgres-compose-network
+
+networks:
+  postgres-compose-network:
+    driver: bridge
