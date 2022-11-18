@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class FormatarExcecao {
 
-    @ExceptionHandler({InvalidEntity.class, RuntimeException.class})
-    public ResponseEntity<Object> sqlError(InvalidEntity ex) {
+    @ExceptionHandler({GenericException.class, RuntimeException.class})
+    public ResponseEntity<Object> sqlError(GenericException ex) {
         String retorno = "{" +
                 "\"codigo\":\""+ex.getCode()+"\"," +
                 "\"mensagem\":\""+ex.getMessage()+"\"" +

@@ -1,13 +1,21 @@
 package flix.processor.ImageProcessor.Configurations;
 
-import flix.processor.ImageProcessor.Listeners.ImageListener;
+import flix.processor.ImageProcessor.Listeners.DataProcessListener;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.CustomExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class RabbitMQConfig {
@@ -26,15 +34,33 @@ public class RabbitMQConfig {
         return new Queue(queueName, false);
     }
 
+    @Bean
+    CustomExchange delayExchange() {
+        Map<String, Object> args = new HashMap<String, Object>();
+        args.put("x-delayed-type", "direct");
+        return new CustomExchange("my-exchange", "x-delayed-message", true, false, args);
+    }
+
+    @Bean
+    public MessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
+
     //create MessageListenerContainer using default connection factory
     @Bean
     MessageListenerContainer messageListenerContainer(ConnectionFactory connectionFactory) {
         SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
         simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
         simpleMessageListenerContainer.setQueues(queue());
-        simpleMessageListenerContainer.setMessageListener(new ImageListener());
+//        simpleMessageListenerContainer.setMessageListener(new DataProcessListener());
         return simpleMessageListenerContainer;
 
+    }
+
+    public AmqpTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(jsonMessageConverter());
+        return rabbitTemplate;
     }
 
     //create custom connection factory

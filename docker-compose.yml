@@ -30,11 +30,9 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq_management
-
     ports:
       - "5672:5672"
       - "15672:15672"
-
     volumes:
       # data persistence
       - /docker_conf/rabbitmq/data/:/var/lib/rabbitmq/
@@ -42,6 +40,40 @@ services:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
     restart: always
+    networks:
+      - postgres-compose-network
+
+  eureka:
+    image: eureka-server:1.0.0
+    container_name: eureka
+    ports:
+      - "8761:8761"
+    restart: always
+    environment:
+      - server.port=8761
+      - eureka.client.registerWithEureka=false
+      - eureka.client.fetchRegistry=false
+    depends_on:
+      - pgadmin
+      - rabbitmq
+    build:
+      context: eureka
+      dockerfile: ../eureka/Dockerfile
+    networks:
+      - postgres-compose-network
+  webapi:
+    image: webapi-rest:1.0.0
+    container_name: webapi
+    ports:
+      - "9001:9001"
+    restart: always
+    depends_on:
+      - eureka
+      - pgadmin
+      - rabbitmq
+    build:
+      context: webapi
+      dockerfile: ../webapi/Dockerfile
     networks:
       - postgres-compose-network
 

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/FlixProcessor.iml" filepath="$PROJECT_DIR$/.idea/FlixProcessor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WebApi/WebApi.iml" filepath="$PROJECT_DIR$/WebApi/WebApi.iml" />
     </modules>
   </component>
 </project>

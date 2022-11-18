@@ -10,8 +10,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableRabbit
 public class ImageProcessor {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ImageProcessor.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ImageProcessor.class, args);
+    }
 
 }

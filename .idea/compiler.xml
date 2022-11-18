@@ -9,15 +9,17 @@
         <outputRelativeToContentRoot value="true" />
         <module name="ImageProcessor" />
         <module name="User" />
-        <module name="Shared.Models" />
+        <module name="WebApi" />
         <module name="eureka" />
-        <module name="tiktok" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="image_processor" target="1.8" />
       <module name="movies" target="1.8" />
+      <module name="Shared.Models" target="1.8" />
       <module name="test_user_test" target="1.8" />
+      <module name="tiktok" target="1.8" />
+      <module name="WebApi" target="1.8" />
       <module name="webapi" target="1.8" />
     </bytecodeTargetLevel>
   </component>
@@ -25,6 +27,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="ImageProcessor" options="-parameters" />
       <module name="User" options="-parameters" />
+      <module name="WebApi" options="-parameters" />
       <module name="eureka" options="-parameters" />
       <module name="image_processor" options="-parameters" />
       <module name="movies" options="-parameters" />

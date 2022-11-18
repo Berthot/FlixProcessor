@@ -1,8 +1,14 @@
 package flix.processor.user.service;
 
+import flix.processor.user.dto.UserDto;
+import flix.processor.user.dto.ValidateUserRequestDto;
+import flix.processor.user.dto.ValidateUserResponseDto;
 import flix.processor.user.entity.User;
 import flix.processor.user.repository.UserRepository;
-import flix.processor.user.util.excecao.InvalidEntity;
+import flix.processor.user.util.excecao.GenericException;
+import lombok.var;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +22,18 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User Create(User user) throws InvalidEntity {
+    public UserDto Create(UserDto userDto) throws GenericException {
+        var encrypted = passwordEncoder().encode(userDto.getPassword());
+        var user = new User(userDto.getName(), userDto.getLogin(), encrypted);
         if (GetUserIsNotValid(user)) {
-            throw new InvalidEntity("ERR001", "entity data are invalid");
+            throw new GenericException("ERR001", "entity data are invalid");
         }
 
-        return userRepository.save(user);
+        var userSaved=  userRepository.save(user);
+        return new UserDto(userSaved);
+    }
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
     private static boolean GetUserIsNotValid(User user) {
@@ -33,7 +45,14 @@ public class UserService {
     }
 
     public User GetById(Integer id) {
-        return userRepository.findById(id).get();
+        User user;
+        try {
+            user = userRepository.findById(id).get();
+        } catch (Exception ex) {
+            user = new User();
+        }
+        return user;
+
 
     }
 
@@ -41,4 +60,14 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+
+    public ValidateUserResponseDto ValidateUser(ValidateUserRequestDto validate) {
+        try {
+            var user = GetById(validate.getUserId());
+            return new ValidateUserResponseDto(!user.getName().equals(""));
+        }
+        catch (Exception ex){
+            return new ValidateUserResponseDto(false);
+        }
+    }
 }
