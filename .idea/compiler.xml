@@ -9,7 +9,8 @@
         <outputRelativeToContentRoot value="true" />
         <module name="ImageProcessor" />
         <module name="User" />
-        <module name="WebApi" />
+        <module name="webapi" />
+        <module name="flixReport" />
         <module name="eureka" />
       </profile>
     </annotationProcessing>
@@ -20,7 +21,6 @@
       <module name="test_user_test" target="1.8" />
       <module name="tiktok" target="1.8" />
       <module name="WebApi" target="1.8" />
-      <module name="webapi" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -29,6 +29,7 @@
       <module name="User" options="-parameters" />
       <module name="WebApi" options="-parameters" />
       <module name="eureka" options="-parameters" />
+      <module name="flixReport" options="-parameters" />
       <module name="image_processor" options="-parameters" />
       <module name="movies" options="-parameters" />
       <module name="test_user_test" options="-parameters" />

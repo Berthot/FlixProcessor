@@ -10,7 +10,7 @@
     </parent>
     <groupId>flix.processor</groupId>
     <artifactId>user</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>user</name>
     <description>micro-service for users</description>
     <properties>

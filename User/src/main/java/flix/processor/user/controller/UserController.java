@@ -1,6 +1,7 @@
 package flix.processor.user.controller;
 
 import flix.processor.user.dto.UserDto;
+import flix.processor.user.dto.UserReportDto;
 import flix.processor.user.dto.ValidateUserRequestDto;
 import flix.processor.user.entity.User;
 import flix.processor.user.service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -52,6 +54,15 @@ public class UserController {
     public List<User> GetAll() {
 
         return userService.GetAll();
+    }
+
+    @GetMapping("/report")
+    public List<UserReportDto> GetAllReport() {
+        List<UserReportDto> reports = new ArrayList<>();
+        for (User i : userService.GetAll()) {
+            reports.add(new UserReportDto(i.getId(), i.getName(), i.getEmail()));
+        }
+        return reports;
     }
 
     @GetMapping("/{id}")

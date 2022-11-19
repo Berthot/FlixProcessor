@@ -1,0 +1,100 @@
+version: '3'
+
+services:
+  db:
+    container_name: db_postgres
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: bertho
+      POSTGRES_PASSWORD: idkfa123
+      POSTGRES_DB: flix
+    ports:
+      - "5555:5555"
+    networks:
+      - postgres-compose-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: equipe@puc.com.br
+      PGADMIN_DEFAULT_PASSWORD: batata123
+    ports:
+      - "16543:80"
+    depends_on:
+      - db
+    networks:
+      - postgres-compose-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      # data persistence
+      - /docker_conf/rabbitmq/data/:/var/lib/rabbitmq/
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: always
+    networks:
+      - postgres-compose-network
+
+  eureka:
+    image: eureka-server:1.0.0
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    restart: always
+    environment:
+      - server.port=8761
+      - eureka.client.registerWithEureka=false
+      - eureka.client.fetchRegistry=false
+      - eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+    depends_on:
+      - pgadmin
+      - rabbitmq
+    build:
+      context: eureka
+      dockerfile: ../eureka/Dockerfile
+    networks:
+      - postgres-compose-network
+
+  webapi:
+    image: webapi-rest:1.0.0
+    container_name: webapi
+    ports:
+      - "9001:9001"
+    restart: always
+    depends_on:
+      - rabbitmq
+      - pgadmin
+      - eureka
+    environment:
+      - springdoc.api-docs.path=/api-docs
+      - springdoc.swagger-ui.path=/swagger-ui.html
+      - springdoc.swagger-ui.operations-sorter=method
+      - server.port=9001
+      - spring.application.name=user
+      - eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+      - eureka.instance.preferIpAddress=true
+      - spring.rabbitmq.host=localhost
+      - spring.rabbitmq.port=5672
+      - spring.rabbitmq.username=guest
+      - spring.rabbitmq.password=guest
+      - spring.rabbitmq.template.default-receive-queue=process_image
+      - javainuse.rabbitmq.queue=process_image
+      - queue.name=process_image
+    build:
+      context: webapi
+      dockerfile: ../webapi/Dockerfile
+    networks:
+      - postgres-compose-network
+
+
+networks:
+  postgres-compose-network:
+    driver: bridge

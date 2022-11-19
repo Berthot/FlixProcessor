@@ -4,13 +4,17 @@ services:
   db:
     container_name: db_postgres
     image: postgres
+    expose:
+      - "7777"
+    ports:
+      - "7777:7777"
     restart: always
     environment:
       POSTGRES_USER: bertho
       POSTGRES_PASSWORD: idkfa123
-      POSTGRES_DB: flix
-    ports:
-      - "5555:5555"
+      POSTGRES_DB: flix-processor
+
+    command: -p 5433
     networks:
       - postgres-compose-network
 
@@ -45,7 +49,7 @@ services:
 
   eureka:
     image: eureka-server:1.0.0
-    container_name: eureka
+    container_name: eureka-server
     ports:
       - "8761:8761"
     restart: always
@@ -53,6 +57,7 @@ services:
       - server.port=8761
       - eureka.client.registerWithEureka=false
       - eureka.client.fetchRegistry=false
+      - eureka.client.serviceUrl.defaultZone=http://eureka-server:8761/eureka/
     depends_on:
       - pgadmin
       - rabbitmq
@@ -61,6 +66,7 @@ services:
       dockerfile: ../eureka/Dockerfile
     networks:
       - postgres-compose-network
+
   webapi:
     image: webapi-rest:1.0.0
     container_name: webapi
@@ -68,14 +74,104 @@ services:
       - "9001:9001"
     restart: always
     depends_on:
-      - eureka
-      - pgadmin
       - rabbitmq
+      - pgadmin
+      - eureka
+    environment:
+      - springdoc.api-docs.path=/api-docs
+      - springdoc.swagger-ui.path=/swagger-ui.html
+      - springdoc.swagger-ui.operations-sorter=method
+      - server.port=9001
+      - spring.application.name=user
+      - eureka.client.serviceUrl.defaultZone=http://eureka-server:8761/eureka/
+      - eureka.instance.preferIpAddress=true
+      - spring.rabbitmq.host=rabbitmq_management
+      - spring.rabbitmq.port=5672
+      - spring.rabbitmq.username=guest
+      - spring.rabbitmq.password=guest
+      - spring.rabbitmq.template.default-receive-queue=process_image
+      - javainuse.rabbitmq.queue=process_image
+      - queue.name=process_image
     build:
       context: webapi
       dockerfile: ../webapi/Dockerfile
     networks:
       - postgres-compose-network
+
+  report:
+    image: report-rest:1.0.0
+    container_name: report
+    ports:
+      - "10000:10000"
+    restart: always
+    depends_on:
+      - webapi
+      - rabbitmq
+      - pgadmin
+      - eureka
+    environment:
+      - spring.datasource.driverClassName=org.postgresql.Driver
+      - spring.datasource.url=jdbc:postgresql://localhost:5432/flix-user
+      - spring.datasource.username=bertho
+      - spring.datasource.password=idkfa123
+      - spring.datasource.oracleucp.database-name=flix-user
+      - spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+      - spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+      - spring.jpa.hibernate.ddl-auto=update
+      - spring.h2.console.enabled=true
+      - spring.jpa.show-sql=true
+      - springdoc.api-docs.path=/api-docs
+      - springdoc.swagger-ui.path=/swagger-ui.html
+      - springdoc.swagger-ui.operations-sorter=method
+      - server.port=10000
+      - spring.application.name=user
+      - eureka.client.serviceUrl.defaultZone=http://eureka-server:8761/eureka/
+      - eureka.instance.preferIpAddress=true
+    build:
+      context: webapi
+      dockerfile: ../webapi/Dockerfile
+    networks:
+      - postgres-compose-network
+
+#  processor:
+#    image: image-processor:1.0.0
+#    container_name: image-processor
+#    ports:
+#      - "8001:8001"
+#    restart: always
+#    depends_on:
+#      - webapi
+#      - rabbitmq
+#      - pgadmin
+#      - eureka
+#    environment:
+#      - spring.datasource.driverClassName=org.postgresql.Driver
+#      - spring.datasource.url=jdbc:postgresql://db_postgres:7777/flix-processor
+#      - spring.datasource.username=bertho
+#      - spring.datasource.password=idkfa123
+#      - spring.datasource.oracleucp.database-name=flix-processor
+#      - spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+#      - spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+#      - spring.jpa.hibernate.ddl-auto=update
+#      - spring.h2.console.enabled=true
+#      - spring.jpa.show-sql=true
+#      - springdoc.api-docs.path=/api-docs
+#      - springdoc.swagger-ui.path=/swagger-ui.html
+#      - springdoc.swagger-ui.operations-sorter=method
+#      - server.port=8001
+#      - spring.application.name=user
+#      - eureka.client.serviceUrl.defaultZone=http://eureka-server:8761/eureka/
+#      - eureka.instance.preferIpAddress=true
+#      - spring.rabbitmq.host=rabbitmq_management
+#      - spring.rabbitmq.port=5672
+#      - spring.rabbitmq.username=guest
+#      - spring.rabbitmq.password=guest
+#      - spring.rabbitmq.template.default-receive-queue=process_image
+#      - javainuse.rabbitmq.queue=process_image
+#    build:
+#      context: imageProcessor
+#      dockerfile: ../imageProcessor/Dockerfile
+#
 
 networks:
   postgres-compose-network:
