@@ -1,4 +1,11 @@
-# Descrição do trabalho
+# Trabalho de spring, rabbitmq, postgres
+
+## Execução
+1. ```docker-compose up -d```
+2. ```cd /StressMessages```
+3. ```python3 main.py```
+
+## Requisitos
 
 <br>Desenvolver uma API Rest com Spring Boot para um problem proposto:
 <br>Exemplo: Locação de Veículos, Stream de filmes, etc.
@@ -9,7 +16,6 @@ Funcionalidades:<br>
 <br>3 - 1 Report (Ex: Veículos locados nas últimas 24 horas)
 
 Requisitos:
-
 <br>1 - Conexão com banco de dados
 <br>2 - Tratamento de Erros
 <br>3 - Autenticação via JWT

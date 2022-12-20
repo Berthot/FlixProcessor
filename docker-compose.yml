@@ -98,40 +98,40 @@ services:
     networks:
       - postgres-compose-network
 
-  report:
-    image: report-rest:1.0.0
-    container_name: report
-    ports:
-      - "10000:10000"
-    restart: always
-    depends_on:
-      - webapi
-      - rabbitmq
-      - pgadmin
-      - eureka
-    environment:
-      - spring.datasource.driverClassName=org.postgresql.Driver
-      - spring.datasource.url=jdbc:postgresql://localhost:5432/flix-user
-      - spring.datasource.username=bertho
-      - spring.datasource.password=idkfa123
-      - spring.datasource.oracleucp.database-name=flix-user
-      - spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-      - spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
-      - spring.jpa.hibernate.ddl-auto=update
-      - spring.h2.console.enabled=true
-      - spring.jpa.show-sql=true
-      - springdoc.api-docs.path=/api-docs
-      - springdoc.swagger-ui.path=/swagger-ui.html
-      - springdoc.swagger-ui.operations-sorter=method
-      - server.port=10000
-      - spring.application.name=user
-      - eureka.client.serviceUrl.defaultZone=http://eureka-server:8761/eureka/
-      - eureka.instance.preferIpAddress=true
-    build:
-      context: webapi
-      dockerfile: ../webapi/Dockerfile
-    networks:
-      - postgres-compose-network
+#  report:
+#    image: report-rest:1.0.0
+#    container_name: report
+#    ports:
+#      - "10000:10000"
+#    restart: always
+#    depends_on:
+#      - webapi
+#      - rabbitmq
+#      - pgadmin
+#      - eureka
+#    environment:
+#      - spring.datasource.driverClassName=org.postgresql.Driver
+#      - spring.datasource.url=jdbc:postgresql://localhost:5432/flix-user
+#      - spring.datasource.username=bertho
+#      - spring.datasource.password=idkfa123
+#      - spring.datasource.oracleucp.database-name=flix-user
+#      - spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+#      - spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+#      - spring.jpa.hibernate.ddl-auto=update
+#      - spring.h2.console.enabled=true
+#      - spring.jpa.show-sql=true
+#      - springdoc.api-docs.path=/api-docs
+#      - springdoc.swagger-ui.path=/swagger-ui.html
+#      - springdoc.swagger-ui.operations-sorter=method
+#      - server.port=10000
+#      - spring.application.name=user
+#      - eureka.client.serviceUrl.defaultZone=http://eureka-server:8761/eureka/
+#      - eureka.instance.preferIpAddress=true
+#    build:
+#      context: flixReport
+#      dockerfile: ../flixReport/Dockerfile
+#    networks:
+#      - postgres-compose-network
 
 #  processor:
 #    image: image-processor:1.0.0
